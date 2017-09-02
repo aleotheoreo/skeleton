@@ -14,11 +14,11 @@ import javax.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ReceiptController {
-    final ReceiptDao receipts;
+    //final ReceiptDao receipts;
 
-    public ReceiptController(ReceiptDao receipts) {
-        this.receipts = receipts;
-    }
+    //public ReceiptController(ReceiptDao receipts) {
+    //    this.receipts = receipts;
+    //}
 
     @POST
     public int createReceipt(@Valid CreateReceiptRequest receipt) {
