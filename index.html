@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Receipts</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+</head>
+<body>
+    <h1>My Receipts</h1>
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#collapse1">Add Receipt (+)</a>
+                </h4>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <form id="addReceiptForm" method="POST" action="http://">
+                        <input id="merchant" placeholder="merchant" /><br>
+                        <input id="amount" placeholder="amount" /><br>
+                    </form>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" form="addReceiptForm" id="cancel-receipt">Cancel</button>
+                    <button type="submit" form="addReceiptForm" id="save-receipt">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="receiptList">
+        <table>
+            <tr>
+                <th>Time</th>
+                <th>Merchant</th>
+                <th>$</th>
+                <th>Tags</th>
+            </tr>
+            <tr>
+                <div>
+                    <td>Time1</td>
+                    <td>Merchant1</td>
+                    <td>$1</td>
+                    <td></td>
+                </div>
+            </tr>
+            <tr>
+                <div>
+                    <td>Time2</td>
+                    <td>Merchant2</td>
+                    <td>$2</td>
+                    <td>Tag2</td>
+                </div>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
