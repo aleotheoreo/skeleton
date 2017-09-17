@@ -39,7 +39,13 @@ public class SimpleApplication extends Application<Configuration> {
 
         // Register all Controllers below.  Don't forget
         // you need class and method @Path annotations!
+<<<<<<< HEAD
         env.jersey().register(new StaticHtmlController());
         env.jersey().register(new ReceiptController(receiptDao));
+=======
+        env.jersey().register(new HelloWorldController());
+        env.jersey().register(new ReceiptController());
+        //env.jersey().register(new ReceiptController(receiptDao));
+>>>>>>> added circleci config.yml
     }
 }
