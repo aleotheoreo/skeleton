@@ -17,11 +17,11 @@ import static java.util.stream.Collectors.toList;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ReceiptController {
-    //final ReceiptDao receipts;
+    final ReceiptDao receipts;
 
-    //public ReceiptController(ReceiptDao receipts) {
-    //    this.receipts = receipts;
-    //}
+    public ReceiptController(ReceiptDao receipts) {
+        this.receipts = receipts;
+    }
 
     @POST
     public int createReceipt(@Valid @NotNull CreateReceiptRequest receipt) {
@@ -33,4 +33,5 @@ public class ReceiptController {
         List<ReceiptsRecord> receiptRecords = receipts.getAllReceipts();
         return receiptRecords.stream().map(ReceiptResponse::new).collect(toList());
     }
+
 }

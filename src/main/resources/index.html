@@ -1,59 +1,163 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <title>Receipts</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
     <style>
-        #container {border: 1px solid brown;}
-        H1 {float: left;}
-
-        .button{
-            background-color:#55A;
-            border: 1px solid #229;
-            width: 100px;
-            float: right;
-            font-size: 2em;
-            color: white;
-            text-align: center;
+        .row {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display:         flex;
         }
 
-        #receiptList {
-            border: 1px solid green;
-            clear: both;
+        .add-tag {
+            background-color: lightblue;
         }
 
-        .receipt {
-            background-color: #eee;
-            margin-bottom: 5px;
+        .tagValue {
+            background-color: orange;
         }
 
+        .row:nth-of-type(odd) div {
+            background-color: #efefef;
+        }
+
+        .row:nth-of-type(even) div {
+            background-color: #ffffff;
+        }
+
+        .row div {
+            border: 1px solid black;
+        }
     </style>
     <script>
+        //const api = "http://localhost:8080";
+        //const api = "http://18.221.24.218"; // <- do not need a root api URL if this page is served directly by the API
+        const api = "";
+
+        function cancelReceipt() {
+            $('input[name=merchant]').val('');
+            $('input[name=amount]').val('');
+            $("#add-receipt").click();
+        }
+
+        function saveReceipt() {
+            var url = api + "/receipts";
+            var postBody = {
+                merchant: $("#merchant").val(),
+                amount: $("#amount").val()
+            };
+
+            // Send the data using post
+            $.ajax({
+                type: 'post',
+                url: url,
+                data: JSON.stringify(postBody),
+                contentType: "application/json; charset=utf-8",
+                success: function() {
+                    updateReceiptsList();
+                }
+            });
+        };
+
+        function updateReceiptsList() {
+            $('.receipt').remove();
+            $.getJSON(api+"/receipts", function(receipts) {
+                // create each receipt row
+                for(var i=0; i < receipts.length; i++) {
+                    var receipt = receipts[i];
+                    var tagCellID = 'receipt' + receipt.id + 'Tags';
+                    $(`<div class="row receipt">` +
+                        `<div class="col-sm-1">${receipt.created}</div>` +
+                        `<div class="col-sm-2 merchant">${receipt.merchantName}</div>` +
+                        `<div class="col-sm-1 amount">${receipt.value}</div>` +
+                        `<div class="col-sm-2 tags" id="${tagCellID}"><button class="add-tag" onclick="addTag(this)">Add Tag (+)</button></div>` +
+                      `</div>`).appendTo($("#receiptList"));
+                }
+                $.get(api+"/tags", function(tags){
+                    for(var j=0; j < tags.length; j++) {
+                        var tagCellID = "#receipt" + tags[j].receiptID + 'Tags';
+                        $(tagCellID).prepend(`<button class="tagValue" onclick="removeTag(this)">${tags[j].tag + " (X)"}</button><br>`);
+                    }
+                });
+            });
+        };
+
+        function addTag(obj) {
+            var tagCell = $(obj).parent();
+            var receiptID = tagCell.attr('id').replace("receipt", "").replace("Tags", "");
+            tagCell.append(`<input class="tag_input"></input>`);
+            $(".tag_input").keyup(function(event){
+                var tagName = $(this).val();
+                if (event.which === 13 && tagName) {
+                    var url = api + "/tags/" + tagName;
+                    $.ajax({
+                        url: url,
+                        type: 'PUT',
+                        data: receiptID,
+                        contentType: "application/json; charset=utf-8",
+                        success: function() {
+                            updateReceiptsList();
+                        }
+                    });
+                }
+            });
+        };
+
+        function removeTag(obj) {
+            var tagName = $(obj).html().replace(" (X)", "");
+            var receiptID = $(obj).parent().attr('id').replace("receipt", "").replace("Tags", "");
+            var url = api + "/tags/" + tagName;
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: receiptID,
+                contentType: "application/json; charset=utf-8",
+                success: function() {
+                    updateReceiptsList();
+                }
+            });
+        };
+
         // This is the idiomatic way to ensure that JQuery does not
         // execute until the page has loaded
         $(function(){
-            const api = ""; // <- do not need a root api URL if this page is served directly by the API
-
-            $.getJSON(api+"/receipts", function(receipts){
-                for(var i=0; i < receipts.length; i++) {
-                    var receipt = receipts[i];
-                    $(`<div class="receipt">${receipt.merchantName}<div><span class="receiptTag">t1</span></div></div>`)
-                        .appendTo($("#receiptList"));
-                }
-
-            })
-        })
+            updateReceiptsList();
+        });
     </script>
 </head>
-
 <body>
-<DIV id="container">
-    <h1>My receipts</h1>
-    <div class="button">+</div>
-    <div id="receiptList">
+    <h1>My Receipts</h1>
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#collapse1" id="add-receipt">Add Receipt (+)</a>
+                </h4>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <input id="merchant" name="merchant" placeholder="merchant" /><br>
+                    <input id="amount" name="amount" placeholder="amount" /><br>
+                    <button type="button" id="cancel-receipt" onclick="cancelReceipt()">Cancel</button>
+                    <button type="submit" id="save-receipt" onclick="saveReceipt()">Save</button>
+                </div>
+                <div class="panel-footer"></div>
+            </div>
+        </div>
     </div>
-</DIV>
+    <div class="container-fluid" id="receiptList">
+        <div class="row" id="receiptListHeader">
+            <div class="col-sm-1"><b>Time</b></div>
+            <div class="col-sm-2"><b>Merchant</b></div>
+            <div class="col-sm-1"><b>Amount</b></div>
+            <div class="col-sm-2"><b>Tags</b></div>
+        </div>
+    </div>
 </body>
-
 </html>

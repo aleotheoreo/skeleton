@@ -34,4 +34,14 @@ public class ReceiptDao {
     public List<ReceiptsRecord> getAllReceipts() {
         return dsl.selectFrom(RECEIPTS).fetch();
     }
+
+    public boolean isValidReceiptID(Integer receiptID) {
+        return dsl.fetchExists(RECEIPTS, RECEIPTS.ID.eq(receiptID));
+    }
+
+    public ReceiptsRecord getReceipt(Integer receiptID) {
+        return dsl.selectFrom(RECEIPTS)
+                .where(RECEIPTS.ID.eq(receiptID))
+                .fetchOne();
+    }
 }
